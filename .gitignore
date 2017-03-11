@@ -1,4 +1,4 @@
 env.prod
 env.dev
-env/*
+venv/*
 *.swp
