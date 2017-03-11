@@ -28,8 +28,10 @@ slack_events_adapter = SlackEventAdapter(SLACK_VERIFICATION_TOKEN, "/slack/event
 SLACK_CLIENT_ID = os.environ["SLACK_CLIENT_ID"]
 SLACK_CLIENT_SECRET = os.environ["SLACK_CLIENT_SECRET"]
 SLACK_TEST_TOKEN = os.environ["SLACK_TEST_TOKEN"]
+SLACK2ARENA_CHANNEL= os.environ["SLACK2ARENA_CHANNEL"]
 
 ARENA_ACCESS_TOKEN = os.environ["ARENA_ACCESS_TOKEN"]
+ARENA_POST_URL = os.environ["ARENA_POST_URL"]
 
 CLIENT = SlackClient(SLACK_TEST_TOKEN)
 
@@ -89,17 +91,15 @@ def handle_message(event_data):
     #     CLIENTS[team_id].api_call("chat.postMessage", channel=channel, text=message)
 
 def handle_arena_link(event_data):
-    post_url = 'http://api.are.na/v2/channels/tnn-test/blocks'
 
     slack_team_id = event_data["team_id"]
     message = event_data['event']
     channel_name = get_channel_name(message["channel"], slack_team_id)
-    if channel_name in ("hellobots"):
+    if (channel_name == SLACK2ARENA_CHANNEL) and message.get("subtype") is None:
         link_url = extract_url(message)
 
         if link_url is not None:
-            logger.info(link_url)
-            response = requests.post(post_url,
+            response = requests.post(ARENA_POST_URL,
                 headers = {
                         'Authorization': 'Bearer {}'.format(ARENA_ACCESS_TOKEN)},
                 data = {'source': link_url}
@@ -107,13 +107,10 @@ def handle_arena_link(event_data):
 
 
 def extract_url(message):
-    if message.get("subtype") is None:
-        maybe_url = re.match('.*?<(.*?)>.*', message.get("text",""))
-        if (maybe_url is not None) and validators.url(maybe_url.group(1)):
-            logger.info("We have a link!")
-            return maybe_url.group(1)
-        else:
-            return None
+    maybe_url = re.match('.*?<(.*?)[|>].*', message.get("text",""))
+    if (maybe_url is not None) and validators.url(maybe_url.group(1)):
+        logger.info("We have a link!")
+        return maybe_url.group(1)
     else:
         return None
 
