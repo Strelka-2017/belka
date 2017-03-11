@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger()
 
 logging.basicConfig(**{
-    'level': logging.ERROR
+    'level': logging.INFO
 })
 
 # We'll store the SlackClient instances for each team in a
