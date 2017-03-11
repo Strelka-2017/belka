@@ -126,4 +126,4 @@ def get_channel_name(channel_id, team_id):
 # Once we have our addon routes and event listeners configured, we can start the
 # Flask server with the default `/events` endpoint on port 3000
 port = int(os.environ.get('PORT', 3000))
-slack_events_adapter.start(host='0.0.0.0', port=port)
+slack_events_adapter.server.run(host='0.0.0.0', port=port)
