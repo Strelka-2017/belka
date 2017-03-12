@@ -2,3 +2,4 @@ env.prod
 env.dev
 venv/*
 *.swp
+*.pyc
